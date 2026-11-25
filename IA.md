@@ -1,60 +1,35 @@
-# Registro de uso de herramientas de IA (`IA.md`)
-
-Registro de consultas a herramientas de inteligencia artificial conforme al apartado 1.3 del enunciado. Cada miembro del equipo documenta en su sección las consultas correspondientes a su parte del trabajo.
+Registro de las consultas realizadas a la IA por cada miembro del grupo (apartado 1.3 del enunciado).
 
 ---
 
-## Persona 5 (`kaik`) — Ciclo del Avión y Orquestación (`Avion` y `main`)
+## Persona 5 (`kike`) — `Avion` y `main`
 
-### Consulta 1 — Preparación del entorno Git y verificación del proyecto base
-- **Fecha**: 23/11/2026
-- **Miembro del equipo**: `kaik` (Persona 5)
-- **Herramienta usada**: Google Antigravity
-- **Prompt exacto**:
-  > necesito que hagas la practica del enunciado.pdf , tengo el caso 4, preparame el environment de git porque aun no lo he hecho y vincula eso con el github "https://github.com/asensi17/Caso1-TorreDeControl" y luego te digo cual es mi parte del trabajo
-- **Respuesta obtenida (parte relevante)**: Clonación del repositorio remoto en local vinculado a `origin` (`main`), configuración local de exclusiones de compilación en `.git/info/exclude`, compilación de verificación en modo `Release` con CMake + MSVC ejecutando `ejemplo.exe` correctamente y aviso sobre la diferencia entre el Caso 4 indicado en el prompt y el nombre del repositorio `Caso1-TorreDeControl`.
-- **Qué se incorporó**: Configuración local del entorno de trabajo y verificación de compilación del proyecto base.
-- **Qué se descartó o corrigió y por qué**: Se corrigió el caso a implementar tras revisar el documento de reparto del equipo, confirmando que el grupo desarrolla el **Caso 1 (Torre de control de un aeropuerto)** y no el Caso 4.
-- **Ficheros y commits**: Ningún fichero ni commit en el repositorio (únicamente preparación local).
+### Consulta 1 — Cómo provocar un interbloqueo en el avión
 
----
-
-### Consulta 2 — Análisis de dependencias de la Persona 5 respecto al resto del equipo
-- **Fecha**: 23/11/2026
-- **Miembro del equipo**: `kaik` (Persona 5)
-- **Herramienta usada**: Google Antigravity
-- **Prompt exacto**:
-  > he añadido en la carpeta el documento del plan de trabajo, yo soy la persona 5. Puedes hacer mi parte o dependes de la parte de alguno de los otros 5 miembros del grupo?
-- **Respuesta obtenida (parte relevante)**: Identificación de las tareas de la Persona 5 (`caso/Avion.h`, `caso/Avion.cpp`, `caso/main.cpp` y `caso/CMakeLists.txt`). Análisis de dependencias: `Avion` y `main` dependen de las firmas públicas de `TorreControl` (Personas 2 y 3) y `ServiciosTierra` (Persona 4), pero no de `Semaforo` directamente (Persona 1). Propuesta de definir esqueletos mínimos (*stubs*) de `TorreControl` y `ServiciosTierra` para poder implementar, compilar y probar el cierre limpio desde el Hito 1 sin esperar al resto de módulos.
-- **Qué se incorporó**: El planteamiento de contratos/esqueletos mínimos para desacoplar la implementación de `Avion` y `main`.
-- **Qué se descartó o corrigió y por qué**: Se descartó programar la sincronización interna de `TorreControl` y `ServiciosTierra` para no invadir el trabajo asignado a las Personas 2, 3 y 4.
-- **Ficheros y commits**: Diseño aplicado en el commit `666bb39`.
-
----
-
-### Consulta 3 — Implementación de `Avion`, `main` y esqueletos de compilación
 - **Fecha**: 24/11/2026
-- **Miembro del equipo**: `kaik` (Persona 5)
-- **Herramienta usada**: Google Antigravity
+- **Miembro del equipo**: `kike` (Persona 5)
+- **Herramienta usada**: Gemini
 - **Prompt exacto**:
-  > haz todo lo que puedas hacer que no dependa del código de otros miembros, y haz commit y pull. El código que sea muy sencillo, como el que aparece en el temario de la carpeta. Si vas a poner comentarios en el codigo que sean muy pocos y breves
-- **Respuesta obtenida (parte relevante)**:
-  - Implementación de `Avion` (`caso/Avion.h` y `caso/Avion.cpp`) con los 6 pasos del ciclo del avión (espera inicial `2i` ms, solicitud de puerta y pista, aterrizaje `2` ms, liberación de pista, encargo y espera de los 3 servicios de tierra, embarque `2` ms, comprobación de servicios pendientes, solicitud de pista de despegue, liberación de puerta, despegue `2` ms y liberación de pista) junto con el modo `--fallo interbloqueo` (pedir pista primero y puerta tras aterrizar sin soltar la pista).
-  - Implementación de `caso/main.cpp` siguiendo la estructura de `ejemplo/main.cpp`: lectura de las 6 claves con `Config` (`aviones`, `pistas`, `puertas`, `cola`, `operarios`, `pantallas`), creación de `Vigilante`, `Contexto`, `TorreControl`, `ServiciosTierra` y `Avion`, lanzamiento de los 4 tipos de hilos, secuencia de cierre ordenado (`join` de aviones, cierre de `ServiciosTierra` y del panel de `TorreControl`, `join` del resto de hilos), validación del invariante final (`operaciones == 5 * aviones`) y llamada a `Lanzador`.
-  - Configuración del ejecutable `aeropuerto` en `caso/CMakeLists.txt` y creación de esqueletos mínimos en `caso/TorreControl.h/.cpp` y `caso/ServiciosTierra.h/.cpp` con parada limpia mediante `std::mutex` y `std::condition_variable` (RAII, sin espera activa).
-- **Qué se incorporó**: Los ficheros completos de la Persona 5 (`Avion.h`, `Avion.cpp`, `main.cpp`, `caso/CMakeLists.txt`) y los esqueletos temporales de `TorreControl` y `ServiciosTierra` para permitir la compilación limpia con `/W4` (`-Wall -Wextra -Wpedantic`).
-- **Qué se descartó o corrigió y por qué**: Los métodos de pistas, puertas, panel, contador de operaciones y cola de servicios se dejaron como *stubs* mínimos (`TODO`) porque su implementación corresponde a las Personas 2, 3 y 4; al integrarse después cambios remotos en `main`, el commit local inicial (`33ff6c5`) se rebasó limpiamente dando lugar al commit `666bb39`.
-- **Ficheros y commits**: `caso/Avion.h`, `caso/Avion.cpp`, `caso/main.cpp`, `caso/CMakeLists.txt`, `caso/TorreControl.h`, `caso/TorreControl.cpp`, `caso/ServiciosTierra.h`, `caso/ServiciosTierra.cpp` — commit `666bb39` (*Implementar Avion, main y esqueletos de TorreControl y ServiciosTierra*).
+  > Estoy haciendo la clase Avion y tengo que meter el modo `--fallo interbloqueo`. En el caso normal pido primero la puerta y luego la pista para aterrizar. Qué tendría que cambiar en ese orden para que se produzca un interbloqueo sin que me des el código hecho?
+
+- **Respuesta obtenida (parte relevante)**: Me explicó que, si todos los aviones piden primero la puerta y después la pista, no se genera una espera circular. Para provocar el interbloqueo, tendría que cambiar el orden y pedir primero la pista, aterrizar y, sin soltarla, pedir la puerta. De esta forma, si hay aviones esperando una pista para despegar mientras otros tienen la pista ocupada y esperan una puerta libre, pueden acabar bloqueándose entre ellos.
+
+- **Qué se incorporó**: Añadí un `if (_interbloqueo)` en `Avion::ejecutar()` para que, en ese modo, el avión pida primero la pista, espere el tiempo del aterrizaje y después solicite la puerta sin liberar la pista.
+
+- **Qué se descartó o corrigió y por qué**: Gemini también propuso añadir un `sleep` antes de solicitar la puerta para facilitar que se produjera el fallo, pero no fue necesario, ya que con los tiempos que teníamos el interbloqueo se producía igualmente.
 
 ---
 
-### Consulta 4 — Redacción del registro `IA.md` para la Persona 5
+### Consulta 2 — Por qué el `main` no terminaba al finalizar
+
 - **Fecha**: 24/11/2026
-- **Miembro del equipo**: `kaik` (Persona 5)
-- **Herramienta usada**: Google Antigravity
+- **Miembro del equipo**: `kike` (Persona 5)
+- **Herramienta usada**: Gemini
 - **Prompt exacto**:
-  > puedes generar el archivo IA.md (solo de lo que corresponde a mi parte del trabajo) y hacer commit + push?
-- **Respuesta obtenida (parte relevante)**: Creación del documento `IA.md` en la raíz del repositorio recogiendo fecha, miembro, herramienta, prompts exactos, respuestas relevantes, código incorporado, descartes/correcciones y trazabilidad a ficheros y commits de la Persona 5.
-- **Qué se incorporó**: Este fichero `IA.md` con la sección correspondiente a la Persona 5.
-- **Qué se descartó o corrigió y por qué**: Se documentó exclusivamente el trabajo de la Persona 5 para que el resto de integrantes añadan sus propias entradas en sus respectivos commits.
-- **Ficheros y commits**: `IA.md` (incorporado en el commit de creación de `IA.md`).
+  > En el main lanzo los hilos de aviones, operarios, pantallas y el operador, y al final les hago `join()` a todos. Los aviones terminan bien pero el programa no acaba nunca, porque puede ser?
+
+- **Respuesta obtenida**: Me explicó que los hilos de los aviones sí terminan, pero los operarios, las pantallas y el operador siguen ejecutándose porque están en bucles esperando a que se cumpla una condición. Al hacer `join()` sin avisarles de que ya no van a llegar más aviones, se quedan esperando indefinidamente. Para solucionarlo, primero hay que esperar a que terminen los aviones, después avisar al resto de hilos mediante un método de cierre que active un booleano y llame a `notify_all()`, y finalmente esperar a que terminen esos otros hilos.
+
+- **Qué se incorporó**: En `main.cpp` separé los `join()`. Primero espero a que terminen los aviones, después llamo a `servicios.cerrar()` y `torre.cerrarPanel()`, y por último hago `join()` de los operarios, las pantallas y el operador.
+
+- **Qué se descartó o corrigió y por qué**: También se planteó usar `detach()` para los hilos que se ejecutan en segundo plano, pero lo descarté porque el enunciado pide que todos los hilos se cierren correctamente y de forma controlada.
